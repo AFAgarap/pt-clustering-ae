@@ -46,9 +46,9 @@ class Decoder(tf.keras.layers.Layer):
 		self.input_layer = tf.keras.layers.InputLayer(input_shape=(latent_dim, ))
 		self.hidden_layer_1 = tf.keras.layers.Dense(units=(7 * 7 * 32), activation=tf.nn.relu)
 		self.reshape = tf.keras.layers.Reshape(target_shape=(7, 7, 32))
-		self.conv_layer_1 = tf.keras.layers.Conv2DTranpose(filters=64, kernel_size=3, strides=(2, 2), padding='SAME', activation=tf.nn.relu)
-		self.conv_layer_2 = tf.keras.layers.Conv2DTranpose(filters=32, kernel_size=3, strides=(2, 2), padding='SAME', activation=tf.nn.relu)
-		self.output_layer = tf.keras.layers.Conv2DTranpose(filters=1, kernel_size=3, strides=(1, 1), padding='SAME', activation=tf.nn.sigmoid)
+		self.conv_layer_1 = tf.keras.layers.Conv2DTranspose(filters=64, kernel_size=3, strides=(2, 2), padding='SAME', activation=tf.nn.relu)
+		self.conv_layer_2 = tf.keras.layers.Conv2DTranspose(filters=32, kernel_size=3, strides=(2, 2), padding='SAME', activation=tf.nn.relu)
+		self.output_layer = tf.keras.layers.Conv2DTranspose(filters=1, kernel_size=3, strides=(1, 1), padding='SAME', activation=tf.nn.sigmoid)
 
 	def call(self, input_features):
 		input_features = self.input_layer(input_features)
