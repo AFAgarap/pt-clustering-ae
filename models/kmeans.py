@@ -16,6 +16,9 @@ class Clustering():
 
     def train(self, training_data):
         self.model.fit(training_data)
+    
+    def predict(self, data):
+        self.model.predict(data)
 
     def benchmark(self, name, data):
         start_time = time()
