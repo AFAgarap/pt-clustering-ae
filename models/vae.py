@@ -41,8 +41,8 @@ class Decoder(tf.keras.layers.Layer):
 		self.output_layer = tf.keras.layers.Dense(units=original_dim, activation=tf.nn.sigmoid)
 
 	def call(self, input_features):
-		x = self.hidden_layer(x)
-		output = self.output_layer(x)
+		activation = self.hidden_layer(input_features)
+		output = self.output_layer(activation)
 		return output
 
 class VariationalAutoencoder(tf.keras.Model):
