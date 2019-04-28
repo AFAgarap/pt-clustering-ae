@@ -9,20 +9,37 @@ Clustering is a well-studied task in terms of development of efficient algorithm
 
 ## Results
 
+### Experiment Setup
+Experiments were done in Google Colaboratory that provides a free access to Tesla K80 GPU with a 12GB RAM allotment. We trained the VAE model with Adam optimization on the MNIST dataset (60,000 training images) for 60 epochs with mini-batches of 512 which took 3 minutes and 35 seconds, and on the Fashion-MNIST dataset (60,000 training images) for 60 epochs with mini-batches of 512 which took 3 minutes and 42 seconds.
+
+For clustering, we trained the k-Means clustering algorithm using the 60,000 training images (from both MNIST and Fashion-MNIST) in its (1) original data representation, (2) latent code representation (from VAE), and (3) reconstructed data representation (from VAE). Then, we used the trained clustering model on the Gaussian noise-augmented 10,000 test images in all three data representations as we did in training.
+
+### Visualization of Learned Representations
+
+We visualize the reconstructed data by the VAE model on the MNIST and Fashion-MNIST datasets. Figure 1 shows the original data with Gaussian noise and a reconstructed sample from the trained VAE model on the MNIST dataset. Figure 2 shows the original data with Gaussian noise and a reconstructed sample from the trained VAE model on the Fashion-MNIST dataset. This finding corroborates the results from literature on the capability of VAE to denoise images
+
 ![](assets/mnist_noise_clean.png)
-**The top row consists of the MNIST images with added Gaussian noise while the bottom row are the reconstructed images using the trained VAE.**
+**Figure 1. The top row consists of the MNIST images with added Gaussian noise while the bottom row are the reconstructed images using the trained VAE.**
 
 ![](assets/fmnist_noise_clean.png)
-**The top row consists of the Fashion-MNIST images with added Gaussian noise while the bottom row are the reconstructed images using the trained VAE.**
+**Figure 2. The top row consists of the Fashion-MNIST images with added Gaussian noise while the bottom row are the reconstructed images using the trained VAE.**
+
+We then visualize the learned representation of the VAE model for the MNIST and Fashion-MNIST datasets. To this end, we used t-SNE visualization to reduce the dimensionality of the learned latent representation $z$ from 10 to 3, and the original data $x$ and the reconstructed data $\hat{x}$ from 784 to 3. Figures 3 and 4 show the scatter plot of the features. We can see in these figures that the clusters in the learned latent data representations are denser compared to the clusters in the original data and in the reconstructed data.
 
 ![](assets/tsne_mnist.png)
-**t-SNE visualization of the MNIST dataset with number of components = 3, and perplexity = 50. The left plot shows the t-SNE visualization for the original data, the middle for the reconstructed data, and the right for the latent code.**
+**Figure 3. t-SNE visualization of the MNIST dataset with number of components = 3, and perplexity = 50. The left plot shows the t-SNE visualization for the original data, the middle for the reconstructed data, and the right for the latent code.**
 
 ![](assets/tsne_fmnist.png)
-**t-SNE visualization of the Fashion-MNIST dataset with number of components = 3, and perplexity = 50. The left plot shows the t-SNE visualization for the original data, the middle for the reconstructed data, and the right for the latent code.**
+**Figure 4. t-SNE visualization of the Fashion-MNIST dataset with number of components = 3, and perplexity = 50. The left plot shows the t-SNE visualization for the original data, the middle for the reconstructed data, and the right for the latent code.**
+
+### Clustering on Samples
+
+We used a k-Means clustering model on the MNIST and Fashion-MNIST datasets with the *k-means++* initialization and with $k = 10$ since there are 10 classes in both MNIST and Fashion-MNIST, and trained it for 500 iterations per dataset input. The first input is the original data representation, the second is the reconstructed data by the VAE model, and the third is the latent code from the VAE model.
+
+As we have seen in Figures 3 and 4, the clusters in the learned latent data representation are denser when compared to the clusters in the original data and in the reconstructed data. The clustering performance as shown in the Voronoi digrams (see Figure 5 and 6) is at its best when we use the latent data representation.
 
 ![](assets/clustering_mnist.png)
-**Voronoi diagram for the k-Means clustering algorithm prediction on the MNIST dataset. The left diagram shows the clustering on the original dataset, the middle for the reconstructed data, and the right for the latent code.**
+**Figure 5. Voronoi diagram for the k-Means clustering algorithm prediction on the MNIST dataset. The left diagram shows the clustering on the original dataset, the middle for the reconstructed data, and the right for the latent code.**
 
 ![](assets/clustering_fmnist.png)
-**Voronoi diagram for the k-Means clustering algorithm prediction on the Fashion-MNIST dataset. The left diagram shows the clustering on the original dataset, the middle for the reconstructed data, and the right for the latent code.**
+**Figure 6. Voronoi diagram for the k-Means clustering algorithm prediction on the Fashion-MNIST dataset. The left diagram shows the clustering on the original dataset, the middle for the reconstructed data, and the right for the latent code.**
