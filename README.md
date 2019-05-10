@@ -56,7 +56,7 @@ Although these visual results do provide some evidence that the clustering perfo
 |Reconstructed|2.300|0.099|563.361|
 |**Latent Code**|**1.557**|**0.186**|**1497.287**|
 
-**Table 1. Clustering Evaluation on the original data, reconstructed data, and latent code for the Fashion-MNIST dataset.**
+**Table 2. Clustering Evaluation on the original data, reconstructed data, and latent code for the Fashion-MNIST dataset.**
 
 |Data|Davies-Bouldin Index|Silhouette Score|Calinski-Harabasz Score|
 |----|--------------------|----------------|-----------------------|
