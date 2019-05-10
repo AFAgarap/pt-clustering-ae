@@ -49,6 +49,7 @@ We posit the following reasons for this density: (1) only the most salient featu
 Although these visual results do provide some evidence that the clustering performance may be improved through the use of latent code, we proceed to a more explicit measurement of the clustering quality as laid down in Tables 1 and 2.
 
 **Table 1. Clustering Evaluation on the original data, reconstructed data, and latent code for the MNIST dataset.**
+
 |Data|Davies-Bouldin Index|Silhouette Score|Calinski-Harabasz Score|
 |----|--------------------|----------------|-----------------------|
 |Original|2.857|0.061|391.245|
@@ -56,6 +57,7 @@ Although these visual results do provide some evidence that the clustering perfo
 |**Latent Code**|**1.557**|**0.186**|**1497.287**|
 
 **Table 1. Clustering Evaluation on the original data, reconstructed data, and latent code for the Fashion-MNIST dataset.**
+
 |Data|Davies-Bouldin Index|Silhouette Score|Calinski-Harabasz Score|
 |----|--------------------|----------------|-----------------------|
 |Original|1.811|0.155|1269.635|
