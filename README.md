@@ -45,3 +45,21 @@ As we have seen in Figures 3 and 4, the clusters in the learned latent data repr
 **Figure 6. Voronoi diagram for the k-Means clustering algorithm prediction on the Fashion-MNIST dataset. The left diagram shows the clustering on the original dataset, the middle for the reconstructed data, and the right for the latent code.**
 
 We posit the following reasons for this density: (1) only the most salient features are included in the latent space representation of the data - a simpler and lower-dimension data representation - this is also the reason behind its denoising capability, and (2) as per [12](https://arxiv.org/abs/1312.6114), [24](https://arxiv.org/abs/1401.0118), [27](https://projecteuclid.org/euclid.ba/1386166315), learning  the approximateinference inevitably results to lower variance, influencing thedata points to cluster near their expected value[9](https://www.deeplearningbook.org/) – which consequently helps the objective of the clustering algorithm, i.e. variance minimization.
+
+Although these visual results do provide some evidence that the clustering performance may be improved through the use of latent code, we proceed to a more explicit measurement of the clustering quality as laid down in Tables 1 and 2.
+
+**Table 1. Clustering Evaluation on the original data, reconstructed data, and latent code for the MNIST dataset.**
+|Data|Davies-Bouldin Index|Silhouette Score|Calinski-Harabasz Score|
+|----|--------------------|----------------|-----------------------|
+|Original|2.857|0.061|391.245|
+|Reconstructed|2.300|0.099|563.361|
+|**Latent Code**|**1.557**|**0.186**|**1497.287**|
+
+**Table 1. Clustering Evaluation on the original data, reconstructed data, and latent code for the Fashion-MNIST dataset.**
+|Data|Davies-Bouldin Index|Silhouette Score|Calinski-Harabasz Score|
+|----|--------------------|----------------|-----------------------|
+|Original|1.811|0.155|1269.635|
+|Reconstructed|1.419|0.216|2010.841|
+|**Latent Code**|**1.328**|**0.238**|**3609.196**|
+
+A low Davies-Bouldin Index denotes better cluster separations, while both high Silhouette Score and high Calinski-Harabasz Score denote better-defined clusters. As we can see, in both MNIST and Fashion-MNIST dataset, the clustering was at its best on the latent code from the VAE.
