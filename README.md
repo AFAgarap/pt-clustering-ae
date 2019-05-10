@@ -1,7 +1,7 @@
 Improved Clustering Performance using Latent Data Representation from Variational Autoencoder
 ===
 
-[![AUR](https://img.shields.io/aur/license/yaourt.svg)]()
+by Abien Fred Agarap and Arnulfo Azcarraga, PhD
 
 ## Abstract
 
@@ -24,7 +24,7 @@ We visualize the reconstructed data by the VAE model on the MNIST and Fashion-MN
 ![](assets/fmnist_noise_clean.png)
 **Figure 2. The top row consists of the Fashion-MNIST images with added Gaussian noise while the bottom row are the reconstructed images using the trained VAE.**
 
-We then visualize the learned representation of the VAE model for the MNIST and Fashion-MNIST datasets. To this end, we used t-SNE visualization to reduce the dimensionality of the learned latent representation $z$ from 10 to 3, and the original data $x$ and the reconstructed data $\hat{x}$ from 784 to 3. Figures 3 and 4 show the scatter plot of the features. We can see in these figures that the clusters in the learned latent data representations are denser compared to the clusters in the original data and in the reconstructed data.
+We then visualize the learned representation of the VAE model for the MNIST and Fashion-MNIST datasets. To this end, we used t-SNE visualization to reduce the dimensionality of the learned latent representation _z_ from 10 to 3, and the original data _x_ and the reconstructed data from 784 to 3. Figures 3 and 4 show the scatter plot of the features. We can see in these figures that the clusters in the learned latent data representations are denser compared to the clusters in the original data and in the reconstructed data.
 
 ![](assets/tsne_mnist.png)
 **Figure 3. t-SNE visualization of the MNIST dataset with number of components = 3, and perplexity = 50. The left plot shows the t-SNE visualization for the original data, the middle for the reconstructed data, and the right for the latent code.**
@@ -34,7 +34,7 @@ We then visualize the learned representation of the VAE model for the MNIST and 
 
 ### Clustering on Samples
 
-We used a k-Means clustering model on the MNIST and Fashion-MNIST datasets with the *k-means++* initialization and with $k = 10$ since there are 10 classes in both MNIST and Fashion-MNIST, and trained it for 500 iterations per dataset input. The first input is the original data representation, the second is the reconstructed data by the VAE model, and the third is the latent code from the VAE model.
+We used a k-Means clustering model on the MNIST and Fashion-MNIST datasets with the *k-means++* initialization and with _k = 10_ since there are 10 classes in both MNIST and Fashion-MNIST, and trained it for 500 iterations per dataset input. The first input is the original data representation, the second is the reconstructed data by the VAE model, and the third is the latent code from the VAE model.
 
 As we have seen in Figures 3 and 4, the clusters in the learned latent data representation are denser when compared to the clusters in the original data and in the reconstructed data. The clustering performance as shown in the Voronoi digrams (see Figure 5 and 6) is at its best when we use the latent data representation.
 
@@ -43,3 +43,5 @@ As we have seen in Figures 3 and 4, the clusters in the learned latent data repr
 
 ![](assets/clustering_fmnist.png)
 **Figure 6. Voronoi diagram for the k-Means clustering algorithm prediction on the Fashion-MNIST dataset. The left diagram shows the clustering on the original dataset, the middle for the reconstructed data, and the right for the latent code.**
+
+We posit the following reasons for this density: (1) only the most salient features are included in the latent space representation of the data - a simpler and lower-dimension data representation - this is also the reason behind its denoising capability, and (2) as per [12](https://arxiv.org/abs/1312.6114), [24](https://arxiv.org/abs/1401.0118), [27](https://projecteuclid.org/euclid.ba/1386166315), learning  the approximateinference inevitably results to lower variance, influencing thedata points to cluster near their expected value[9](https://www.deeplearningbook.org/) – which consequently helps the objective of the clustering algorithm, i.e. variance minimization.
