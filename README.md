@@ -65,3 +65,23 @@ Although these visual results do provide some evidence that the clustering perfo
 |**Latent Code**|**1.328**|**0.238**|**3609.196**|
 
 A low Davies-Bouldin Index denotes better cluster separations, while both high Silhouette Score and high Calinski-Harabasz Score denote better-defined clusters. As we can see, in both MNIST and Fashion-MNIST dataset, the clustering was at its best on the latent code from the VAE.
+
+## License
+
+```
+Using latent code from variational autoencoder for clustering
+Copyright (C) 2019  Abien Fred Agarap
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+```
