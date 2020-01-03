@@ -14,20 +14,16 @@ import numpy as np
 import seaborn as sns
 from sklearn.decomposition import PCA
 import tensorflow as tf
-from tensorflow.keras.datasets import cifar10
-from tensorflow.keras.datasets import fashion_mnist
-from tensorflow.keras.datasets import mnist
 
 
 def load_dataset(
     dataset: str = "mnist",
     batch_size: int = 64,
-    one_hot: bool = True,
     flatten: bool = False,
     as_supervised: bool = True,
 ) -> Tuple[tf.data.Dataset, tf.data.Dataset, np.ndarray, np.ndarray]:
     """
-    Returns a dataset object.
+    Returns a tuple of dataset objects.
 
     Parameters
     ----------
@@ -35,8 +31,6 @@ def load_dataset(
         The dataset to load.
     batch_size : int
         The mini-batch size.
-    one_hot : bool
-        Whether to onehot-encode the labels or not.
     flatten : bool
         Whether to flatten the vector or not.
 
@@ -51,68 +45,52 @@ def load_dataset(
     test_labels : numpy.ndarray
         The test labels in NumPy array.
     """
-    if (dataset == "mnist") or (dataset == "MNIST"):
-        (train_features, train_labels), (test_features, test_labels) = mnist.load_data()
-        train_features = train_features.reshape(-1, 28, 28, 1)
-        test_features = test_features.reshape(-1, 28, 28, 1)
-    elif (dataset == "fashion_mnist") or (dataset == "FMNIST"):
-        (
-            (train_features, train_labels),
-            (test_features, test_labels),
-        ) = fashion_mnist.load_data()
-        train_features = train_features.reshape(-1, 28, 28, 1)
-        test_features = test_features.reshape(-1, 28, 28, 1)
-    elif (dataset == "cifar10") or (dataset == "CIFAR10"):
-        (
-            (train_features, train_labels),
-            (test_features, test_labels),
-        ) = cifar10.load_data()
-        train_features = train_features.reshape(-1, 32, 32, 3)
-        test_features = test_features.reshape(-1, 32, 32, 3)
+    train_dataset = tfds.load(name=dataset, split=tfds.Split.TRAIN, batch_size=-1)
+    test_dataset = tfds.load(name=dataset, split=tfds.Split.TEST, batch_size=-1)
+
+    train_dataset = tfds.as_numpy(train_dataset)
+    test_dataset = tfds.as_numpy(test_dataset)
+
+    train_features = train_dataset["image"]
+    train_labels = train_dataset["label"]
+    test_features = test_dataset["image"]
+    test_labels = test_dataset["label"]
 
     train_features = train_features.astype("float32")
     train_features = train_features / 255.0
+    features_shape = train_features.shape[1:]
 
     test_features = test_features.astype("float32")
     test_features = test_features / 255.0
 
     if flatten:
-        dim = tf.math.reduce_prod(train_features.shape[1:]).numpy()
-        train_features = train_features.reshape(-1, dim)
-        test_features = test_features.reshape(-1, dim)
+        features_shape = np.prod(features_shape)
+        train_features = train_features.reshape(-1, features_shape)
+        test_features = test_features.reshape(-1, features_shape)
 
-    if one_hot:
-        classes = len(np.unique(train_labels))
-        train_labels = tf.one_hot(train_labels, classes)
-        test_labels = tf.one_hot(test_labels, classes)
+    num_classes = len(np.unique(train_labels))
+    train_labels = tf.one_hot(train_labels, num_classes)
+    test_labels = tf.one_hot(test_labels, num_classes)
 
     if as_supervised:
         train_dataset = tf.data.Dataset.from_tensor_slices(
             (train_features, train_labels)
         )
-        train_dataset = train_dataset.batch(batch_size)
-        train_dataset = train_dataset.prefetch(batch_size * 4)
-        train_dataset = train_dataset.shuffle(train_features.shape[0])
-
         test_dataset = tf.data.Dataset.from_tensor_slices((test_features, test_labels))
-        test_dataset = test_dataset.batch(batch_size // 4)
-        test_dataset = test_dataset.prefetch(batch_size * 4)
-    elif not as_supervised:
+    else:
         train_dataset = tf.data.Dataset.from_tensor_slices(
-            (train_features, train_features)
+            (train_features, train_labels)
         )
-        train_dataset = train_dataset.batch(batch_size)
-        train_dataset = train_dataset.prefetch(batch_size * 4)
-        train_dataset = train_dataset.shuffle(train_features.shape[0])
+        test_dataset = tf.data.Dataset.from_tensor_slices((test_features, test_labels))
 
-        test_dataset = tf.data.Dataset.from_tensor_slices(
-            (test_features, test_features)
-        )
-        test_dataset = test_dataset.batch(batch_size // 4)
-        test_dataset = test_dataset.prefetch(batch_size * 4)
+    train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    train_dataset = train_dataset.batch(batch_size=batch_size)
+    train_dataset = train_dataset.shuffle(train_features.shape[0])
 
-    return train_dataset, test_dataset, test_features, test_labels
+    test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    test_dataset = test_dataset.batch(batch_size=batch_size)
 
+    return (train_dataset, test_dataset, test_features, test_labels)
 
 
 def encode(features: np.ndarray, components: int = 3) -> np.ndarray:
