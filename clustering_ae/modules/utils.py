@@ -70,25 +70,37 @@ def load_tfds(name: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray
     return train_features, test_features, train_labels, test_labels
 
 
-def encode(features: np.ndarray, components: int = 3) -> np.ndarray:
+def encode(
+    train_features: np.ndarray,
+    test_features: np.ndarray,
+    components: int = 3,
+    seed: int = 42,
+) -> np.ndarray:
     """
     Returns a PCA-encoded feature tensor.
 
     Parameters
     ----------
-    features : np.ndarray
-        The feature tensor to encode.
+    train_features : np.ndarray
+        The training feature tensor to encode.
+    test_features : np.ndarray
+        The test feature tensor to encode.
     components : int
         The number of components to which the `features` will be reduced to.
+    seed : int
+        The random seed value.
 
     Returns
     -------
-    enc_features : np.ndarray
-        The PCA-encoded features with `components`-dimension.
+    enc_train_features : np.ndarray
+        The PCA-encoded training features with `components`-dimension.
+    enc_test_features : np.ndarray
+        The PCA-encoded test features with `components`-dimension.
     """
-    pca = PCA(n_components=components)
-    enc_features = pca.fit_transform(features)
-    return enc_features
+    pca = PCA(n_components=components, random_state=seed)
+    enc_train_features = pca.fit_transform(train_features)
+    enc_test_features = pca.transform(test_features)
+    return enc_train_features, enc_test_features
 
 
 def plot(features: np.ndarray, labels: np.ndarray, dimension: str = "3d") -> None:
