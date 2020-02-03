@@ -208,4 +208,3 @@ def clustering_accuracy(y_true, y_pred):
     ind = linear_assignment(w.max() - w)
 
     return sum([w[i, j] for i, j in ind]) * 1.0 / y_pred.size
-
