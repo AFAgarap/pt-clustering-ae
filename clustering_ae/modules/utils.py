@@ -168,3 +168,29 @@ def plot(features: np.ndarray, labels: np.ndarray, dimension: str = "3d") -> Non
         plt.ylabel("feature 1")
         plt.show()
 
+
+def clustering_accuracy(y_true, y_pred):
+    """
+    Metric from Guo et al., 2018
+    [http://proceedings.mlr.press/v95/guo18b/guo18b.pdf]
+
+    Calculate clustering accuracy. Require scikit-learn installed
+    # Arguments
+        y: true labels, numpy.array with shape `(n_samples,)`
+        y_pred: predicted labels, numpy.array with shape `(n_samples,)`
+    # Return
+        accuracy, in [0,1]
+    """
+    y_true = y_true.astype(np.int64)
+    assert y_pred.size == y_true.size
+    D = max(y_pred.max(), y_true.max()) + 1
+    w = np.zeros((D, D), dtype=np.int64)
+    for i in range(y_pred.size):
+        w[y_pred[i], y_true[i]] += 1
+
+    from sklearn.utils.linear_assignment_ import linear_assignment
+
+    ind = linear_assignment(w.max() - w)
+
+    return sum([w[i, j] for i, j in ind]) * 1.0 / y_pred.size
+
