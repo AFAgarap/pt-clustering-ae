@@ -119,15 +119,16 @@ def plot(features: np.ndarray, labels: np.ndarray, dimension: str = "3d") -> Non
     sns.set_style("darkgrid")
     figure = plt.figure(figsize=(12, 8))
 
-    if dimension == "3d" or features.shape[-1] == 3:
+    if dimension == "3d":
         ax = figure.gca(projection="3d")
         ax.scatter(features[:, 0], features[:, 1], features[:, 2], c=labels, marker="o")
         ax.set_xlabel("feature 0")
         ax.set_ylabel("feature 1")
         ax.set_zlabel("feature 2")
         plt.show()
-    elif dimension == "2d" or features.shape[-1] == 2:
+    elif dimension == "2d":
         plt.scatter(features[:, 0], features[:, 1], c=labels, marker="o")
         plt.xlabel("feature 0")
         plt.ylabel("feature 1")
         plt.show()
+
