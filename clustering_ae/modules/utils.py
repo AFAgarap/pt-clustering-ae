@@ -70,6 +70,42 @@ def load_tfds(name: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray
     return train_features, test_features, train_labels, test_labels
 
 
+def create_dataset(
+    features: np.ndarray,
+    labels: np.ndarray,
+    batch_size: int,
+    as_supervised: bool = True,
+) -> tf.data.Dataset:
+    """
+    Returns a `tf.data.Dataset` object from a pair of
+    `features` and `labels` or `features` alone.
+
+    Parameters
+    ----------
+    features : np.ndarray
+        The features matrix.
+    labels : np.ndarray
+        The labels matrix.
+    batch_size : int
+        The mini-batch size.
+    as_supervised : bool
+        Boolean whether to load the dataset as supervised or not.
+
+    Returns
+    -------
+    dataset : tf.data.Dataset
+        The dataset pipeline object, ready for model usage.
+    """
+    if as_supervised:
+        dataset = tf.data.Dataset.from_tensor_slices((features, labels))
+    else:
+        dataset = tf.data.Dataset.from_tensor_slices((features, features))
+    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    dataset = dataset.batch(batch_size)
+    dataset = dataset.shuffle(features.shape[1])
+    return dataset
+
+
 def encode(
     train_features: np.ndarray,
     test_features: np.ndarray,
