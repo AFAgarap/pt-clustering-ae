@@ -17,81 +17,57 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 
 
-def load_dataset(
-    dataset: str = "mnist",
-    batch_size: int = 64,
-    flatten: bool = False,
-    as_supervised: bool = True,
-) -> Tuple[tf.data.Dataset, tf.data.Dataset, np.ndarray, np.ndarray]:
+def load_tfds(name: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Returns a tuple of dataset objects.
+    Returns a data set from `tfds`.
+
+    For this experiment, the options are:
+        1. mnist
+        2. fashion_mnist
+        3. emnist/letters
+        4. cifar10
+        5. svhn_cropped
 
     Parameters
     ----------
-    dataset : str
-        The dataset to load.
-    batch_size : int
-        The mini-batch size.
-    flatten : bool
-        Whether to flatten the vector or not.
+    name : str
+        The name of the TensorFlow data set to load.
 
     Returns
     -------
-    train_dataset : tf.data.Dataset
-        The training dataset object.
-    test_dataset : tf.data.Dataset
-        The test dataset object.
-    test_features : numpy.ndarray
-        The test features in NumPy array.
-    test_labels : numpy.ndarray
-        The test labels in NumPy array.
+    train_features : np.ndarray
+        The train features.
+    test_features : np.ndarray
+        The test features.
+    train_labels : np.ndarray
+        The train labels.
+    test_labels : np.ndarray
+        The test labels.
     """
-    train_dataset = tfds.load(name=dataset, split=tfds.Split.TRAIN, batch_size=-1)
-    test_dataset = tfds.load(name=dataset, split=tfds.Split.TEST, batch_size=-1)
-
+    tf.config.experimental.set_memory_growth(
+        tf.config.experimental.list_physical_devices("GPU")[0], True
+    )
+    train_dataset = tfds.load(name=name, split=tfds.Split.TRAIN, batch_size=-1)
     train_dataset = tfds.as_numpy(train_dataset)
-    test_dataset = tfds.as_numpy(test_dataset)
 
     train_features = train_dataset["image"]
     train_labels = train_dataset["label"]
+
+    train_features = train_features.astype("float32")
+    train_features = train_features.reshape(-1, np.prod(train_features.shape[1:]))
+    train_features = train_features / 255.0
+
+    test_dataset = tfds.load(name=name, split=tfds.Split.TEST, batch_size=-1)
+    test_dataset = tfds.as_numpy(test_dataset)
+
     test_features = test_dataset["image"]
     test_labels = test_dataset["label"]
 
-    train_features = train_features.astype("float32")
-    train_features = train_features / 255.0
-    features_shape = train_features.shape[1:]
-
     test_features = test_features.astype("float32")
+    test_features = test_features.reshape(-1, np.prod(test_features.shape[1:]))
     test_features = test_features / 255.0
 
-    if flatten:
-        features_shape = np.prod(features_shape)
-        train_features = train_features.reshape(-1, features_shape)
-        test_features = test_features.reshape(-1, features_shape)
-
-    num_classes = len(np.unique(train_labels))
-    train_labels = tf.one_hot(train_labels, num_classes)
-    test_labels = tf.one_hot(test_labels, num_classes)
-
-    if as_supervised:
-        train_dataset = tf.data.Dataset.from_tensor_slices(
-            (train_features, train_labels)
-        )
-        test_dataset = tf.data.Dataset.from_tensor_slices((test_features, test_labels))
-    else:
-        train_dataset = tf.data.Dataset.from_tensor_slices(
-            (train_features, train_labels)
-        )
-        test_dataset = tf.data.Dataset.from_tensor_slices((test_features, test_labels))
-
-    train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
-    train_dataset = train_dataset.batch(batch_size=batch_size)
-    train_dataset = train_dataset.shuffle(train_features.shape[0])
-
-    test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
-    test_dataset = test_dataset.batch(batch_size=batch_size)
-
-    return (train_dataset, test_dataset, test_features, test_labels)
+    return train_features, test_features, train_labels, test_labels
 
 
 def encode(features: np.ndarray, components: int = 3) -> np.ndarray:
