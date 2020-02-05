@@ -208,3 +208,20 @@ def clustering_accuracy(y_true, y_pred):
     ind = linear_assignment(w.max() - w)
 
     return sum([w[i, j] for i, j in ind]) * 1.0 / y_pred.size
+
+
+def export_benchmark(results: dict, filename: str):
+    """
+    Exports the benchmark results.
+
+    Parameters
+    ----------
+    results : dict
+        The benchmark results.
+    filename : str
+        The filename of the exported results.
+    """
+    results = {key: str(value) for key, value in results.items()}
+    with open("{}.json".format(filename), "w") as file:
+        json.dump(results, file)
+
