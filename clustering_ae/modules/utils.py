@@ -21,6 +21,7 @@ from __future__ import print_function
 __author__ = "Abien Fred Agarap"
 __version__ = "1.0.0"
 
+import json
 from typing import Tuple
 
 import matplotlib.pyplot as plt
