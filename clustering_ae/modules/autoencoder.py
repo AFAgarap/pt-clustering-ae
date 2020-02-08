@@ -52,7 +52,9 @@ class Autoencoder(nn.Module):
         return reconstruction
 
 
-def train_step(model: nn.Module, optimizer: object, features: torch.Tensor, loss_fn: object) -> torch.Tensor:
+def train_step(
+    model: nn.Module, optimizer: object, features: torch.Tensor, loss_fn: object
+) -> torch.Tensor:
     optimizer.zero_grad()
     outputs = model(features)
     train_loss = loss_fn(outputs, features)
