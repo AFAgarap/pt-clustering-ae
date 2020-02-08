@@ -50,3 +50,12 @@ class Autoencoder(nn.Module):
         activation = self.reconstruction_layer(activation)
         reconstruction = torch.sigmoid(activation)
         return reconstruction
+
+
+def train_step(model: nn.Module, optimizer: object, features: torch.Tensor, loss_fn: object) -> torch.Tensor:
+    optimizer.zero_grad()
+    outputs = model(features)
+    train_loss = loss_fn(outputs, features)
+    train_loss.backward()
+    optimizer.step()
+    return train_loss
