@@ -55,6 +55,25 @@ class Autoencoder(nn.Module):
 def train_step(
     model: nn.Module, optimizer: object, features: torch.Tensor, loss_fn: object
 ) -> torch.Tensor:
+    """
+    Trains a model for a single step.
+
+    Parameters
+    ----------
+    model : nn.Module
+        The model to train.
+    optimizer : object
+        The optimizer function to use.
+    features : torch.Tensor
+        The features to train on.
+    loss_fn : object
+        The loss function to optimize.
+
+    Returns
+    -------
+    train_loss : torch.Tensor
+        The training loss for a single step.
+    """
     optimizer.zero_grad()
     outputs = model(features)
     train_loss = loss_fn(outputs, features)
