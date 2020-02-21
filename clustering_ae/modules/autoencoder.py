@@ -80,3 +80,21 @@ def train_step(
     train_loss.backward()
     optimizer.step()
     return train_loss
+
+
+def train(
+    model: torch.nn.Module,
+    data_loader: torch.utils.data.DataLoader,
+    epochs: int,
+    loss: object,
+    optimizer: object,
+) -> list:
+    train_loss = []
+    for epoch in range(epochs):
+        epoch_loss = []
+        for batch_features, batch_labels in data_loader:
+            step_loss = train_loss(model, optimizer, batch_features, loss)
+            epoch_loss.append(step_loss.item())
+        epoch_loss = torch.mean(epoch_loss)
+        train_loss.append(epoch_loss)
+    return train_loss
