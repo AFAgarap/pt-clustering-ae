@@ -21,80 +21,94 @@ import torch.nn as nn
 class Autoencoder(nn.Module):
     def __init__(self, **kwargs):
         super().__init__()
-        self.enc_hidden_layer_1 = nn.Linear(kwargs["input_shape"], 500)
-        self.enc_hidden_layer_2 = nn.Linear(500, 500)
-        self.enc_hidden_layer_3 = nn.Linear(500, 2000)
-        self.code_layer = nn.Linear(2000, kwargs["code_dim"])
-
-        self.dec_hidden_layer_1 = nn.Linear(kwargs["code_dim"], 2000)
-        self.dec_hidden_layer_2 = nn.Linear(2000, 500)
-        self.dec_hidden_layer_3 = nn.Linear(500, 500)
-        self.reconstruction_layer = nn.Linear(500, kwargs["input_shape"])
+        self.encoder_layers = torch.nn.ModuleList(
+            [
+                torch.nn.Linear(in_features=kwargs["input_shape"], out_features=500),
+                torch.nn.ReLU(),
+                torch.nn.Linear(in_features=500, out_features=500),
+                torch.nn.ReLU(),
+                torch.nn.Linear(in_features=500, out_features=2000),
+                torch.nn.ReLU(),
+                torch.nn.Linear(in_features=2000, out_features=kwargs["code_dim"]),
+                torch.nn.Sigmoid(),
+            ]
+        )
+        self.decoder_layers = torch.nn.ModuleList(
+            [
+                torch.nn.Linear(in_features=kwargs["code_dim"], out_features=2000),
+                torch.nn.ReLU(),
+                torch.nn.Linear(in_features=2000, out_features=500),
+                torch.nn.ReLU(),
+                torch.nn.Linear(in_features=500, out_features=500),
+                torch.nn.ReLU(),
+                torch.nn.Linear(in_features=500, out_features=kwargs["input_shape"]),
+                torch.nn.Sigmoid(),
+            ]
+        )
+        self.optimizer = torch.optim.Adam(
+            params=self.parameters(), lr=kwargs["learning_rate"]
+        )
+        self.criterion = torch.nn.BCELoss()
 
     def forward(self, features):
-        activation = self.enc_hidden_layer_1(features)
-        activation = torch.relu(activation)
-        activation = self.enc_hidden_layer_2(activation)
-        activation = torch.relu(activation)
-        activation = self.enc_hidden_layer_3(activation)
-        activation = torch.relu(activation)
-        activation = self.code_layer(activation)
-        code = torch.sigmoid(activation)
-
-        activation = self.dec_hidden_layer_1(code)
-        activation = torch.relu(activation)
-        activation = self.dec_hidden_layer_2(activation)
-        activation = torch.relu(activation)
-        activation = self.dec_hidden_layer_3(activation)
-        activation = torch.relu(activation)
-        activation = self.reconstruction_layer(activation)
-        reconstruction = torch.sigmoid(activation)
+        activations = {}
+        for index, encoder_layer in enumerate(self.encoder_layers):
+            if index == 0:
+                activations[index] = encoder_layer(features)
+            else:
+                activations[index] = encoder_layer(activations[index - 1])
+        code = activations[len(activations) - 1]
+        activations = {}
+        for index, decoder_layer in enumerate(self.decoder_layers):
+            if index == 0:
+                activations[index] = decoder_layer(code)
+            else:
+                activations[index] = decoder_layer(activations[index - 1])
+        reconstruction = activations[len(activations) - 1]
         return reconstruction
 
+    def fit(self, data_loader, epochs):
+        """
+        Trains the autoencoder model.
 
-def train_step(
-    model: nn.Module, optimizer: object, features: torch.Tensor, loss_fn: object
-) -> torch.Tensor:
+        Parameters
+        ----------
+        data_loader : torch.utils.dataloader.DataLoader
+            The data loader object that consists of the data pipeline.
+        epochs : int
+            The number of epochs to train the model.
+        """
+        train_loss = []
+        for epoch in range(epochs):
+            epoch_loss = epoch_train(self, data_loader)
+            train_loss.append(epoch_loss)
+            print(f"epoch {epoch + 1}/{epochs} : mean loss = {train_loss[-1]:.6f}")
+        self.train_loss = train_loss
+
+
+def epoch_train(model, data_loader):
     """
-    Trains a model for a single step.
+    Trains a model for one epoch.
 
     Parameters
     ----------
-    model : nn.Module
+    model : torch.nn.Module
         The model to train.
-    optimizer : object
-        The optimizer function to use.
-    features : torch.Tensor
-        The features to train on.
-    loss_fn : object
-        The loss function to optimize.
+    data_loader : torch.utils.dataloader.DataLoader
+        The data loader object that consists of the data pipeline.
 
     Returns
     -------
-    train_loss : torch.Tensor
-        The training loss for a single step.
+    epoch_loss : float
+        The epoch loss.
     """
-    optimizer.zero_grad()
-    outputs = model(features)
-    train_loss = loss_fn(outputs, features)
-    train_loss.backward()
-    optimizer.step()
-    return train_loss
-
-
-def train(
-    model: torch.nn.Module,
-    data_loader: torch.utils.data.DataLoader,
-    epochs: int,
-    loss: object,
-    optimizer: object,
-) -> list:
-    train_loss = []
-    for epoch in range(epochs):
-        epoch_loss = []
-        for batch_features, batch_labels in data_loader:
-            step_loss = train_loss(model, optimizer, batch_features, loss)
-            epoch_loss.append(step_loss.item())
-        epoch_loss = torch.mean(epoch_loss)
-        train_loss.append(epoch_loss)
-    return train_loss
+    epoch_loss = 0
+    for batch_features, batch_labels in data_loader:
+        model.optimizer.zero_grad()
+        outputs = model(batch_features)
+        train_loss = model.criterion(outputs, batch_features)
+        train_loss.backward()
+        model.optimizer.step()
+        epoch_loss += train_loss.item()
+    epoch_loss /= len(data_loader)
+    return epoch_loss
