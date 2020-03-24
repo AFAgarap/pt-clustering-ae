@@ -43,23 +43,20 @@ class Autoencoder(nn.Module):
         ])
 
     def forward(self, features):
-        activation = self.enc_hidden_layer_1(features)
-        activation = torch.relu(activation)
-        activation = self.enc_hidden_layer_2(activation)
-        activation = torch.relu(activation)
-        activation = self.enc_hidden_layer_3(activation)
-        activation = torch.relu(activation)
-        activation = self.code_layer(activation)
-        code = torch.sigmoid(activation)
-
-        activation = self.dec_hidden_layer_1(code)
-        activation = torch.relu(activation)
-        activation = self.dec_hidden_layer_2(activation)
-        activation = torch.relu(activation)
-        activation = self.dec_hidden_layer_3(activation)
-        activation = torch.relu(activation)
-        activation = self.reconstruction_layer(activation)
-        reconstruction = torch.sigmoid(activation)
+        activations = {}
+        for index, encoder_layer in enumerate(self.encoder_layers):
+            if index == 0:
+                activations[index] = encoder_layer(features)
+            else:
+                activations[index] = encoder_layer(activations[index - 1])
+        code = activations[len(activations) - 1]
+        activations = {}
+        for index, decoder_layer in enumerate(self.decoder_layers):
+            if index == 0:
+                activations[index] = decoder_layer(code)
+            else:
+                activations[index] = decoder_layer(activations[index - 1])
+        reconstruction = activations[len(activations) - 1]
         return reconstruction
 
 
