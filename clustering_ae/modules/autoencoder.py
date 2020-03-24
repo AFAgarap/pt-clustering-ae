@@ -59,6 +59,24 @@ class Autoencoder(nn.Module):
         reconstruction = activations[len(activations) - 1]
         return reconstruction
 
+    def fit(self, data_loader, epochs):
+        """
+        Trains the autoencoder model.
+
+        Parameters
+        ----------
+        data_loader : torch.utils.dataloader.DataLoader
+            The data loader object that consists of the data pipeline.
+        epochs : int
+            The number of epochs to train the model.
+        """
+        train_loss = []
+        for epoch in range(epochs):
+            epoch_loss = epoch_train(self, data_loader)
+            train_loss.append(epoch_loss)
+            print(f"epoch {epoch + 1}/{epochs} : mean loss = {train_loss[-1]:.6f}")
+        self.train_loss = train_loss
+
 
 def epoch_train(model, data_loader):
     epoch_loss = 0
