@@ -41,6 +41,8 @@ class Autoencoder(nn.Module):
             torch.nn.Linear(in_features=500, out_features=kwargs["input_shape"]),
             torch.nn.Sigmoid()
         ])
+        self.optimizer = torch.optim.Adam(params=self.parameters(), lr=kwargs["learning_rate"])
+        self.criterion = torch.nn.BCELoss()
 
     def forward(self, features):
         activations = {}
