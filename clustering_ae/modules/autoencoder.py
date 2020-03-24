@@ -60,6 +60,19 @@ class Autoencoder(nn.Module):
         return reconstruction
 
 
+def epoch_train(model, data_loader):
+    epoch_loss = 0
+    for batch_features, batch_labels in data_loader:
+        model.optimizer.zero_grad()
+        outputs = model(batch_features)
+        train_loss = model.criterion(outputs, batch_features)
+        train_loss.backward()
+        model.optimizer.step()
+        epoch_loss += train_loss.item()
+    epoch_loss /= len(data_loader)
+    return epoch_loss
+
+
 def train_step(
     model: nn.Module, optimizer: object, features: torch.Tensor, loss_fn: object
 ) -> torch.Tensor:
