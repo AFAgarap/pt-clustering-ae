@@ -21,15 +21,26 @@ import torch.nn as nn
 class Autoencoder(nn.Module):
     def __init__(self, **kwargs):
         super().__init__()
-        self.enc_hidden_layer_1 = nn.Linear(kwargs["input_shape"], 500)
-        self.enc_hidden_layer_2 = nn.Linear(500, 500)
-        self.enc_hidden_layer_3 = nn.Linear(500, 2000)
-        self.code_layer = nn.Linear(2000, kwargs["code_dim"])
-
-        self.dec_hidden_layer_1 = nn.Linear(kwargs["code_dim"], 2000)
-        self.dec_hidden_layer_2 = nn.Linear(2000, 500)
-        self.dec_hidden_layer_3 = nn.Linear(500, 500)
-        self.reconstruction_layer = nn.Linear(500, kwargs["input_shape"])
+        self.encoder_layers = torch.nn.ModuleList([
+            torch.nn.Linear(in_features=kwargs["input_shape"], out_features=500),
+            torch.nn.ReLU(),
+            torch.nn.Linear(in_features=500, out_features=500),
+            torch.nn.ReLU(),
+            torch.nn.Linear(in_features=500, out_features=2000),
+            torch.nn.ReLU(),
+            torch.nn.Linear(in_features=2000, out_features=kwargs["code_dim"]),
+            torch.nn.Sigmoid()
+        ])
+        self.decoder_layers = torch.nn.ModuleList([
+            torch.nn.Linear(in_features=kwargs["code_dim"], out_features=2000),
+            torch.nn.ReLU(),
+            torch.nn.Linear(in_features=2000, out_features=500),
+            torch.nn.ReLU(),
+            torch.nn.Linear(in_features=500, out_features=500),
+            torch.nn.ReLU(),
+            torch.nn.Linear(in_features=500, out_features=kwargs["input_shape"]),
+            torch.nn.Sigmoid()
+        ])
 
     def forward(self, features):
         activation = self.enc_hidden_layer_1(features)
