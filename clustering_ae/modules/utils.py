@@ -136,4 +136,3 @@ def export_benchmark(results: dict, filename: str):
     results = {key: str(value) for key, value in results.items()}
     with open("{}.json".format(filename), "w") as file:
         json.dump(results, file)
-
