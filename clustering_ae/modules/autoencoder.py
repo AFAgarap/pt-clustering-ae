@@ -54,6 +54,7 @@ class Autoencoder(nn.Module):
         self.model_device = model_device
         self.optimizer = torch.optim.Adam(params=self.parameters(), lr=learning_rate)
         self.criterion = torch.nn.BCELoss()
+        self.train_loss = []
 
     def forward(self, features):
         activations = {}
@@ -83,12 +84,10 @@ class Autoencoder(nn.Module):
         epochs : int
             The number of epochs to train the model.
         """
-        train_loss = []
         for epoch in range(epochs):
             epoch_loss = epoch_train(self, data_loader)
-            train_loss.append(epoch_loss)
-            print(f"epoch {epoch + 1}/{epochs} : mean loss = {train_loss[-1]:.6f}")
-        self.train_loss = train_loss
+            self.train_loss.append(epoch_loss)
+            print(f"epoch {epoch + 1}/{epochs} : mean loss = {self.train_loss[-1]:.6f}")
 
 
 def epoch_train(model, data_loader):
