@@ -19,35 +19,40 @@ import torch.nn as nn
 
 
 class Autoencoder(nn.Module):
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        input_shape: int,
+        code_dim: int,
+        learning_rate: float,
+        model_device: torch.device,
+    ):
         super().__init__()
         self.encoder_layers = torch.nn.ModuleList(
             [
-                torch.nn.Linear(in_features=kwargs["input_shape"], out_features=500),
+                torch.nn.Linear(in_features=input_shape, out_features=500),
                 torch.nn.ReLU(),
                 torch.nn.Linear(in_features=500, out_features=500),
                 torch.nn.ReLU(),
                 torch.nn.Linear(in_features=500, out_features=2000),
                 torch.nn.ReLU(),
-                torch.nn.Linear(in_features=2000, out_features=kwargs["code_dim"]),
+                torch.nn.Linear(in_features=2000, out_features=code_dim),
                 torch.nn.Sigmoid(),
             ]
         )
         self.decoder_layers = torch.nn.ModuleList(
             [
-                torch.nn.Linear(in_features=kwargs["code_dim"], out_features=2000),
+                torch.nn.Linear(in_features=code_dim, out_features=2000),
                 torch.nn.ReLU(),
                 torch.nn.Linear(in_features=2000, out_features=500),
                 torch.nn.ReLU(),
                 torch.nn.Linear(in_features=500, out_features=500),
                 torch.nn.ReLU(),
-                torch.nn.Linear(in_features=500, out_features=kwargs["input_shape"]),
+                torch.nn.Linear(in_features=500, out_features=input_shape),
                 torch.nn.Sigmoid(),
             ]
         )
-        self.optimizer = torch.optim.Adam(
-            params=self.parameters(), lr=kwargs["learning_rate"]
-        )
+        self.model_device = model_device
+        self.optimizer = torch.optim.Adam(params=self.parameters(), lr=learning_rate)
         self.criterion = torch.nn.BCELoss()
 
     def forward(self, features):
