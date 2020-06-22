@@ -15,10 +15,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """PyTorch implementation of a vanilla Autoencoder"""
 import torch
-import torch.nn as nn
 
 
-class Autoencoder(nn.Module):
+class Autoencoder(torch.nn.Module):
     def __init__(
         self,
         input_shape: int,
