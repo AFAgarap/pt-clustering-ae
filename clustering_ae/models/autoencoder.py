@@ -86,34 +86,34 @@ class Autoencoder(nn.Module):
         """
         self.to(self.model_device)
         for epoch in range(epochs):
-            epoch_loss = epoch_train(self, data_loader)
+            epoch_loss = self.epoch_train(self, data_loader)
             self.train_loss.append(epoch_loss)
             print(f"epoch {epoch + 1}/{epochs} : mean loss = {self.train_loss[-1]:.6f}")
 
+    @staticmethod
+    def epoch_train(model, data_loader):
+        """
+        Trains a model for one epoch.
 
-def epoch_train(model, data_loader):
-    """
-    Trains a model for one epoch.
+        Parameters
+        ----------
+        model : torch.nn.Module
+            The model to train.
+        data_loader : torch.utils.dataloader.DataLoader
+            The data loader object that consists of the data pipeline.
 
-    Parameters
-    ----------
-    model : torch.nn.Module
-        The model to train.
-    data_loader : torch.utils.dataloader.DataLoader
-        The data loader object that consists of the data pipeline.
-
-    Returns
-    -------
-    epoch_loss : float
-        The epoch loss.
-    """
-    epoch_loss = 0
-    for batch_features, batch_labels in data_loader:
-        model.optimizer.zero_grad()
-        outputs = model(batch_features)
-        train_loss = model.criterion(outputs, batch_features)
-        train_loss.backward()
-        model.optimizer.step()
-        epoch_loss += train_loss.item()
-    epoch_loss /= len(data_loader)
-    return epoch_loss
+        Returns
+        -------
+        epoch_loss : float
+            The epoch loss.
+        """
+        epoch_loss = 0
+        for batch_features, batch_labels in data_loader:
+            model.optimizer.zero_grad()
+            outputs = model(batch_features)
+            train_loss = model.criterion(outputs, batch_features)
+            train_loss.backward()
+            model.optimizer.step()
+            epoch_loss += train_loss.item()
+        epoch_loss /= len(data_loader)
+        return epoch_loss
