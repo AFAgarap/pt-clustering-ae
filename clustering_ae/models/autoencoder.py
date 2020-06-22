@@ -31,7 +31,7 @@ class Autoencoder(torch.nn.Module):
         input_shape: int,
         code_dim: int,
         learning_rate: float,
-        model_device: torch.device,
+        device: torch.device,
     ):
         super().__init__()
         self.encoder_layers = torch.nn.ModuleList(
@@ -58,7 +58,7 @@ class Autoencoder(torch.nn.Module):
                 torch.nn.Sigmoid(),
             ]
         )
-        self.model_device = model_device
+        self.device = device
         self.optimizer = torch.optim.Adam(params=self.parameters(), lr=learning_rate)
         self.criterion = torch.nn.BCELoss()
         self.train_loss = []
