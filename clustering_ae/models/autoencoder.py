@@ -34,7 +34,7 @@ class Autoencoder(torch.nn.Module):
         device: torch.device,
     ):
         super().__init__()
-        self.encoder_layers = torch.nn.ModuleList(
+        self.layers = torch.nn.ModuleList(
             [
                 torch.nn.Linear(in_features=input_shape, out_features=500),
                 torch.nn.ReLU(),
@@ -44,10 +44,6 @@ class Autoencoder(torch.nn.Module):
                 torch.nn.ReLU(),
                 torch.nn.Linear(in_features=2000, out_features=code_dim),
                 torch.nn.Sigmoid(),
-            ]
-        )
-        self.decoder_layers = torch.nn.ModuleList(
-            [
                 torch.nn.Linear(in_features=code_dim, out_features=2000),
                 torch.nn.ReLU(),
                 torch.nn.Linear(in_features=2000, out_features=500),
