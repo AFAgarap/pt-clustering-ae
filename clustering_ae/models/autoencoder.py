@@ -15,19 +15,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """PyTorch implementation of a vanilla Autoencoder"""
 import torch
-import torch.nn as nn
 
 
-class Autoencoder(nn.Module):
+class Autoencoder(torch.nn.Module):
+    """
+    A feed-forward autoencoder neural network that optimizes
+    binary cross entropy using Adam optimizer.
+
+    An optional soft nearest neighbor loss
+    regularizer can be used with the binary cross entropy.
+    """
+
     def __init__(
         self,
         input_shape: int,
         code_dim: int,
         learning_rate: float,
-        model_device: torch.device,
+        device: torch.device,
     ):
         super().__init__()
-        self.encoder_layers = torch.nn.ModuleList(
+        self.layers = torch.nn.ModuleList(
             [
                 torch.nn.Linear(in_features=input_shape, out_features=500),
                 torch.nn.ReLU(),
@@ -37,10 +44,6 @@ class Autoencoder(nn.Module):
                 torch.nn.ReLU(),
                 torch.nn.Linear(in_features=2000, out_features=code_dim),
                 torch.nn.Sigmoid(),
-            ]
-        )
-        self.decoder_layers = torch.nn.ModuleList(
-            [
                 torch.nn.Linear(in_features=code_dim, out_features=2000),
                 torch.nn.ReLU(),
                 torch.nn.Linear(in_features=2000, out_features=500),
@@ -51,25 +54,25 @@ class Autoencoder(nn.Module):
                 torch.nn.Sigmoid(),
             ]
         )
-        self.model_device = model_device
+        for index, layer in enumerate(self.layers):
+            if (index == 6 or index == 14) and isinstance(layer, torch.nn.Linear):
+                torch.nn.init.xavier_uniform_(layer.weight)
+            elif isinstance(layer, torch.nn.Linear):
+                torch.nn.init.kaiming_normal_(layer.weight, nonlinearity="relu")
+            else:
+                pass
+        self.device = device
         self.optimizer = torch.optim.Adam(params=self.parameters(), lr=learning_rate)
         self.criterion = torch.nn.BCELoss()
         self.train_loss = []
 
     def forward(self, features):
         activations = {}
-        for index, encoder_layer in enumerate(self.encoder_layers):
+        for index, layer in enumerate(self.layers):
             if index == 0:
-                activations[index] = encoder_layer(features)
+                activations[index] = layer(features)
             else:
-                activations[index] = encoder_layer(activations[index - 1])
-        code = activations[len(activations) - 1]
-        activations = {}
-        for index, decoder_layer in enumerate(self.decoder_layers):
-            if index == 0:
-                activations[index] = decoder_layer(code)
-            else:
-                activations[index] = decoder_layer(activations[index - 1])
+                activations[index] = layer(activations[index - 1])
         reconstruction = activations[len(activations) - 1]
         return reconstruction
 
@@ -86,34 +89,34 @@ class Autoencoder(nn.Module):
         """
         self.to(self.model_device)
         for epoch in range(epochs):
-            epoch_loss = epoch_train(self, data_loader)
+            epoch_loss = self.epoch_train(self, data_loader)
             self.train_loss.append(epoch_loss)
             print(f"epoch {epoch + 1}/{epochs} : mean loss = {self.train_loss[-1]:.6f}")
 
+    @staticmethod
+    def epoch_train(model, data_loader):
+        """
+        Trains a model for one epoch.
 
-def epoch_train(model, data_loader):
-    """
-    Trains a model for one epoch.
+        Parameters
+        ----------
+        model : torch.nn.Module
+            The model to train.
+        data_loader : torch.utils.dataloader.DataLoader
+            The data loader object that consists of the data pipeline.
 
-    Parameters
-    ----------
-    model : torch.nn.Module
-        The model to train.
-    data_loader : torch.utils.dataloader.DataLoader
-        The data loader object that consists of the data pipeline.
-
-    Returns
-    -------
-    epoch_loss : float
-        The epoch loss.
-    """
-    epoch_loss = 0
-    for batch_features, batch_labels in data_loader:
-        model.optimizer.zero_grad()
-        outputs = model(batch_features)
-        train_loss = model.criterion(outputs, batch_features)
-        train_loss.backward()
-        model.optimizer.step()
-        epoch_loss += train_loss.item()
-    epoch_loss /= len(data_loader)
-    return epoch_loss
+        Returns
+        -------
+        epoch_loss : float
+            The epoch loss.
+        """
+        epoch_loss = 0
+        for batch_features, batch_labels in data_loader:
+            model.optimizer.zero_grad()
+            outputs = model(batch_features)
+            train_loss = model.criterion(outputs, batch_features)
+            train_loss.backward()
+            model.optimizer.step()
+            epoch_loss += train_loss.item()
+        epoch_loss /= len(data_loader)
+        return epoch_loss
