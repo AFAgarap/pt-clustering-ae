@@ -54,6 +54,13 @@ class Autoencoder(torch.nn.Module):
                 torch.nn.Sigmoid(),
             ]
         )
+        for index, layer in enumerate(self.layers):
+            if (index == 6 or index == 14) and isinstance(layer, torch.nn.Linear):
+                torch.nn.init.xavier_uniform_(layer.weight)
+            elif isinstance(layer, torch.nn.Linear):
+                torch.nn.init.kaiming_normal_(layer.weight, nonlinearity="relu")
+            else:
+                pass
         self.device = device
         self.optimizer = torch.optim.Adam(params=self.parameters(), lr=learning_rate)
         self.criterion = torch.nn.BCELoss()
