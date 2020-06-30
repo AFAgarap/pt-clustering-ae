@@ -16,6 +16,9 @@
 """PyTorch implementation of a vanilla Autoencoder"""
 import torch
 
+__author__ = "Abien Fred Agarap"
+__version__ = "1.0.0"
+
 
 class Autoencoder(torch.nn.Module):
     """
