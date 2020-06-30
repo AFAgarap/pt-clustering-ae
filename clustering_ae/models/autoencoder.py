@@ -82,6 +82,18 @@ class Autoencoder(torch.nn.Module):
         self.train_loss = []
 
     def forward(self, features):
+        """
+        Defines the forward pass by the model.
+
+        Parameter
+        ---------
+        features : torch.Tensor
+            The input features.
+        Returns
+        -------
+        reconstruction : torch.Tensor
+            The model output.
+        """
         activations = {}
         for index, layer in enumerate(self.layers):
             if index == 0:
