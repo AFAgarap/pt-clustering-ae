@@ -68,18 +68,11 @@ class Autoencoder(torch.nn.Module):
 
     def forward(self, features):
         activations = {}
-        for index, encoder_layer in enumerate(self.encoder_layers):
+        for index, layer in enumerate(self.layers):
             if index == 0:
-                activations[index] = encoder_layer(features)
+                activations[index] = layer(features)
             else:
-                activations[index] = encoder_layer(activations[index - 1])
-        code = activations[len(activations) - 1]
-        activations = {}
-        for index, decoder_layer in enumerate(self.decoder_layers):
-            if index == 0:
-                activations[index] = decoder_layer(code)
-            else:
-                activations[index] = decoder_layer(activations[index - 1])
+                activations[index] = layer(activations[index - 1])
         reconstruction = activations[len(activations) - 1]
         return reconstruction
 
