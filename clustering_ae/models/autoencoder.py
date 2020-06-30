@@ -33,6 +33,21 @@ class Autoencoder(torch.nn.Module):
         learning_rate: float,
         device: torch.device,
     ):
+        """
+        Constructs the autoencoder model with the following units,
+        <input_shape>-500-500-2000-<code_dim>-2000-500-500-<input_shape>
+
+        Parameters
+        ----------
+        device: torch.device
+            The device to use for the model computations.
+        input_shape: int
+            The dimensionality of the input features.
+        code_dim: int
+            The dimensionality of the latent code.
+        learning_rate: float
+            The learning rate to use for optimization.
+        """
         super().__init__()
         self.layers = torch.nn.ModuleList(
             [
