@@ -115,9 +115,12 @@ def clustering_accuracy(y_true, y_pred):
     for i in range(y_pred.size):
         w[y_pred[i], y_true[i]] += 1
 
-    from sklearn.utils.linear_assignment_ import linear_assignment
+    # from sklearn.utils.linear_assignment_ import linear_assignment
+    from scipy.optimize import linear_sum_assignment
 
-    ind = linear_assignment(w.max() - w)
+    ind = linear_sum_assignment(w.max() - w)
+    ind = np.asarray(ind)
+    ind = np.transpose(ind)
 
     return sum([w[i, j] for i, j in ind]) * 1.0 / y_pred.size
 
