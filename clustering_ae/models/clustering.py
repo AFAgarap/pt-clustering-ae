@@ -22,7 +22,7 @@ from sklearn.metrics import davies_bouldin_score
 from sklearn.metrics import normalized_mutual_info_score as nmi
 from sklearn.metrics import silhouette_score
 
-from clustering_ae.modules.utils import clustering_accuracy
+from clustering_ae.utils import clustering_accuracy
 
 
 class Clustering(object):
