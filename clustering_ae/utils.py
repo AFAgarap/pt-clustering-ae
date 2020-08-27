@@ -115,7 +115,6 @@ def clustering_accuracy(y_true, y_pred):
     for i in range(y_pred.size):
         w[y_pred[i], y_true[i]] += 1
 
-    # from sklearn.utils.linear_assignment_ import linear_assignment
     from scipy.optimize import linear_sum_assignment
 
     ind = linear_sum_assignment(w.max() - w)
