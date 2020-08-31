@@ -14,13 +14,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Helper functions"""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-__author__ = "Abien Fred Agarap"
-__version__ = "1.0.0"
-
 import json
 from typing import Tuple
 
@@ -32,6 +25,9 @@ import seaborn as sns
 from sklearn.decomposition import PCA
 import tensorflow as tf
 import tensorflow_datasets as tfds
+
+__author__ = "Abien Fred Agarap"
+__version__ = "1.0.0"
 
 
 def encode(
