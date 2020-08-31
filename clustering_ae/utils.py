@@ -27,6 +27,7 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+from scipy.optimize import linear_sum_assignment
 import seaborn as sns
 from sklearn.decomposition import PCA
 import tensorflow as tf
@@ -114,8 +115,6 @@ def clustering_accuracy(y_true, y_pred):
     w = np.zeros((D, D), dtype=np.int64)
     for i in range(y_pred.size):
         w[y_pred[i], y_true[i]] += 1
-
-    from scipy.optimize import linear_sum_assignment
 
     ind = linear_sum_assignment(w.max() - w)
     ind = np.asarray(ind)
