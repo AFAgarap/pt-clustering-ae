@@ -65,6 +65,22 @@ class Clustering(object):
             tol=tol,
         )
 
+    def __call__(self, features):
+        """
+        Wraps `self.predict`.
+
+        Parameters
+        ----------
+        features: np.ndarray
+            The instances to cluster.
+
+        Returns
+        -------
+        np.ndarray
+            The indices of the clusters.
+        """
+        return self.predict(features)
+
     def train(self, features):
         """
         Compute the clustering
