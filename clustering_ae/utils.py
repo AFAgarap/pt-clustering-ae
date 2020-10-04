@@ -14,23 +14,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """Helper functions"""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-__author__ = "Abien Fred Agarap"
-__version__ = "1.0.0"
-
 import json
 from typing import Tuple
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+from scipy.optimize import linear_sum_assignment
 import seaborn as sns
 from sklearn.decomposition import PCA
 import tensorflow as tf
 import tensorflow_datasets as tfds
+
+__author__ = "Abien Fred Agarap"
+__version__ = "1.0.0"
 
 
 def encode(
@@ -114,8 +111,6 @@ def clustering_accuracy(y_true, y_pred):
     w = np.zeros((D, D), dtype=np.int64)
     for i in range(y_pred.size):
         w[y_pred[i], y_true[i]] += 1
-
-    from scipy.optimize import linear_sum_assignment
 
     ind = linear_sum_assignment(w.max() - w)
     ind = np.asarray(ind)
