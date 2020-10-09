@@ -23,8 +23,6 @@ import numpy as np
 from scipy.optimize import linear_sum_assignment
 import seaborn as sns
 from sklearn.decomposition import PCA
-import tensorflow as tf
-import tensorflow_datasets as tfds
 
 __author__ = "Abien Fred Agarap"
 __version__ = "1.0.0"
